@@ -9,19 +9,19 @@
 
   <h1>Helping Mindsets</h1>
 
-  <button onclick="teacherLogin()">Teacher Login</button>
-  <button onclick="studentJoin()">Student Join</button>
+  <div class="container">
+    <div class="card">
+      <h2>Teacher</h2>
+      <button onclick="createClass()">Create Class</button>
+    </div>
 
-  <script>
-    function teacherLogin() {
-      alert("Teacher login coming soon!");
-    }
+    <div class="card">
+      <h2>Student</h2>
+      <button onclick="joinClass()">Join Class</button>
+    </div>
+  </div>
 
-    function studentJoin() {
-      let code = prompt("Enter your class code:");
-      alert("Joining class with code: " + code);
-    }
-  </script>
+  <script src="script.js"></script>
 
 </body>
 </html>
