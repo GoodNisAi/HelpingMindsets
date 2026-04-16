@@ -1,127 +1,86 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
 import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  addDoc,
-  getDocs
+  getFirestore, doc, setDoc, getDoc,
+  collection, addDoc, onSnapshot, increment
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged
+  getAuth, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBQnhMU-9h2VCarsyGgEm1f2RFw5OuO84c",
+const app = initializeApp({
+  apiKey: "AIzaSy...",
   authDomain: "helpingmindesets.firebaseapp.com",
   projectId: "helpingmindesets"
-};
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let currentUser = null;
+let user = null;
 let currentClass = "";
+let currentSubject = "";
 
 // NAV
-window.showSection = function(id) {
+window.show = (id) => {
   document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 };
 
 // AUTH
-window.signup = async function() {
-  const user = await createUserWithEmailAndPassword(auth, email.value, password.value);
-
-  await setDoc(doc(db, "teachers", user.user.uid), {
-    email: email.value
-  });
+window.signup = async () => {
+  const u = await createUserWithEmailAndPassword(auth, email.value, password.value);
+  await setDoc(doc(db, "teachers", u.user.uid), { email: email.value });
 };
 
-window.login = async function() {
+window.login = async () => {
   await signInWithEmailAndPassword(auth, email.value, password.value);
 };
 
-onAuthStateChanged(auth, user => {
-  currentUser = user;
+onAuthStateChanged(auth, u => {
+  user = u;
+  userInfo.innerText = u ? u.email : "Not logged in";
 
-  if (user) {
+  if (u) {
     teacherPanel.classList.remove("hidden");
-    loginWarning.style.display = "none";
-  } else {
-    teacherPanel.classList.add("hidden");
-    loginWarning.style.display = "block";
+    teacherLock.style.display = "none";
   }
 });
 
-// CREATE CLASS
-window.createClass = async function() {
-  const code = Math.random().toString(36).substring(2, 7);
-  currentClass = code;
+// CLASS
+window.createClass = async () => {
+  currentClass = Math.random().toString(36).substring(2, 7);
 
-  await setDoc(doc(db, "classes", code), {
-    teacherId: currentUser.uid
+  await setDoc(doc(db, "classes", currentClass), {
+    teacherId: user.uid
   });
 
-  classCode.innerText = "Class Code: " + code;
+  classCode.innerText = currentClass;
 };
 
-// GENERATE STUDENT CODES (IMPORTANT 🔑)
-window.generateStudentCodes = async function() {
-  studentCodes.innerHTML = "";
+// STUDENT CODES
+window.generateCodes = async () => {
+  codesList.innerHTML = "";
 
   for (let i = 0; i < 10; i++) {
-    const code = Math.random().toString(36).substring(2, 7);
+    let code = Math.random().toString(36).substring(2, 7);
 
-    await addDoc(collection(db, "classes", currentClass, "students"), {
-      name: "Student",
-      xp: 0,
-      code: code
+    await setDoc(doc(db, "studentCodes", code), {
+      classId: currentClass,
+      xp: 0
     });
 
     let li = document.createElement("li");
     li.textContent = code;
-    studentCodes.appendChild(li);
+    codesList.appendChild(li);
   }
-};
-
-// STUDENT JOIN WITH CODE
-window.joinWithCode = async function() {
-  const codeInputVal = studentCodeInput.value;
-
-  const classesSnap = await getDocs(collection(db, "classes"));
-
-  for (let classDoc of classesSnap.docs) {
-    const studentsSnap = await getDocs(
-      collection(db, "classes", classDoc.id, "students")
-    );
-
-    for (let student of studentsSnap.docs) {
-      if (student.data().code === codeInputVal) {
-        studentDashboard.classList.remove("hidden");
-        studentName.innerText = "Welcome!";
-        xp.innerText = student.data().xp;
-        return;
-      }
-    }
-  }
-
-  alert("Invalid code");
 };
 
 // SUBJECTS
-window.addSubject = async function() {
-  const name = subjectInput.value;
-
+window.addSubject = async () => {
   await addDoc(collection(db, "classes", currentClass, "subjects"), {
-    name: name
+    name: subjectInput.value
   });
 
   loadSubjects();
@@ -132,9 +91,79 @@ async function loadSubjects() {
 
   subjectList.innerHTML = "";
 
-  snap.forEach(doc => {
+  snap.forEach(d => {
     let li = document.createElement("li");
-    li.textContent = doc.data().name;
+    li.textContent = d.data().name;
+
+    li.onclick = () => {
+      currentSubject = d.id;
+      loadAssignments();
+    };
+
     subjectList.appendChild(li);
   });
+}
+
+// ASSIGNMENTS
+window.addAssignment = async () => {
+  await addDoc(
+    collection(db, "classes", currentClass, "subjects", currentSubject, "assignments"),
+    { text: assignmentInput.value }
+  );
+};
+
+function loadAssignments() {
+  onSnapshot(
+    collection(db, "classes", currentClass, "subjects", currentSubject, "assignments"),
+    snap => {
+      assignmentList.innerHTML = "";
+
+      snap.forEach(d => {
+        let li = document.createElement("li");
+        li.textContent = d.data().text;
+        assignmentList.appendChild(li);
+      });
+    }
+  );
+}
+
+// STUDENT JOIN
+window.join = async () => {
+  const code = studentCodeInput.value;
+  const snap = await getDoc(doc(db, "studentCodes", code));
+
+  if (!snap.exists()) return alert("Invalid code");
+
+  currentClass = snap.data().classId;
+
+  studentDash.classList.remove("hidden");
+
+  loadStudentAssignments(code);
+};
+
+// STUDENT ASSIGNMENTS
+function loadStudentAssignments(code) {
+  onSnapshot(
+    collection(db, "classes", currentClass, "subjects", currentSubject, "assignments"),
+    snap => {
+      studentAssignments.innerHTML = "";
+
+      snap.forEach(d => {
+        let li = document.createElement("li");
+        li.textContent = d.data().text;
+
+        let btn = document.createElement("button");
+        btn.textContent = "Complete";
+
+        btn.onclick = async () => {
+          await updateDoc(doc(db, "studentCodes", code), {
+            xp: increment(10)
+          });
+        };
+
+        li.appendChild(btn);
+        studentAssignments.appendChild(li);
+      });
+    }
+  );
 }
