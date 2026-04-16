@@ -8,7 +8,7 @@
 
 <header class="topbar">
   <h1>Helping Mindsets</h1>
-  <div id="userInfo"></div>
+  <div id="userInfo">👤 Not logged in</div>
 </header>
 
 <div class="app">
@@ -21,83 +21,69 @@
     <button onclick="show('auth')">🔐 Login</button>
   </aside>
 
-  <!-- CONTENT -->
+  <!-- MAIN -->
   <main class="content">
 
     <!-- HOME -->
     <section id="home">
-      <h2>Platform Stats</h2>
-      <div class="cards">
-        <div class="card">Teachers: <span id="teacherCount">0</span></div>
-        <div class="card">Classes: <span id="classCount">0</span></div>
+      <div class="card hero">
+        <h2>🚀 Helping Mindsets</h2>
+        <p>Interactive classroom platform</p>
       </div>
     </section>
 
-    <!-- AUTH -->
+    <!-- LOGIN -->
     <section id="auth" class="hidden">
-      <h2>Login / Signup</h2>
-      <input id="email" placeholder="Email">
-      <input id="password" type="password" placeholder="Password">
-      <button onclick="signup()">Sign Up</button>
-      <button onclick="login()">Login</button>
+      <div class="card">
+        <h2>Login</h2>
+        <input id="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+      </div>
     </section>
 
     <!-- TEACHER -->
     <section id="teacher" class="hidden">
-      <h2>Teacher Dashboard</h2>
+      <div class="card">
+        <h2>🧑‍🏫 Teacher Panel</h2>
 
-      <div id="teacherPanel" class="hidden">
+        <button onclick="createClass()">➕ Create Class</button>
+        <p id="classCode"></p>
 
-        <div class="card">
-          <h3>Class Controls</h3>
-          <button onclick="createClass()">Create Class</button>
-          <p id="classCode"></p>
-        </div>
-
-        <div class="card">
-          <h3>Student Codes</h3>
-          <button onclick="generateCodes()">Generate Codes</button>
-          <ul id="codesList"></ul>
-        </div>
-
-        <div class="card">
-          <h3>Subjects</h3>
-          <input id="subjectInput" placeholder="New subject">
-          <button onclick="addSubject()">Add</button>
-          <ul id="subjectList"></ul>
-        </div>
-
-        <div class="card">
-          <h3>Assignments</h3>
-          <input id="assignmentInput" placeholder="New assignment">
-          <button onclick="addAssignment()">Add</button>
-          <ul id="assignmentList"></ul>
-        </div>
-
+        <button onclick="generateCodes()">🔑 Generate Student Codes</button>
+        <ul id="codesList"></ul>
       </div>
-
-      <p id="teacherLock">Login as teacher to access</p>
     </section>
 
     <!-- STUDENT -->
     <section id="student" class="hidden">
-      <h2>Student</h2>
+      <div class="card">
+        <h2>🎓 Student Join</h2>
 
-      <input id="studentCodeInput" placeholder="Enter code">
-      <button onclick="join()">Join</button>
+        <input id="studentCode" placeholder="Enter code">
+        <button onclick="join()">Join</button>
 
-      <div id="studentDash" class="hidden">
-        <h3 id="studentName"></h3>
-        <p>XP: <span id="xp">0</span></p>
-        <p>Level: <span id="level">0</span></p>
+        <div id="studentDash" class="hidden">
+          <h3>XP: <span id="xp">0</span></h3>
+        </div>
+      </div>
+    </section>
 
-        <ul id="studentAssignments"></ul>
+    <!-- ADMIN -->
+    <section id="admin" class="hidden">
+      <div class="card admin">
+        <h2>⚙️ Admin Panel</h2>
+
+        <button onclick="giveXP()">⚡ Give Everyone +50 XP</button>
+        <button onclick="resetXP()">🔄 Reset XP</button>
+        <button onclick="doubleXP()">🔥 Double XP Mode</button>
+        <button onclick="clearStudents()">🧹 Clear Students</button>
       </div>
     </section>
 
   </main>
 </div>
 
-<script type="module" src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
