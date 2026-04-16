@@ -21,12 +21,7 @@ nav button {
   background: none;
   color: white;
   border: none;
-  padding: 15px;
-  cursor: pointer;
-}
-
-nav button:hover {
-  background: #444;
+  padding: 12px;
 }
 
 main {
@@ -35,39 +30,18 @@ main {
 }
 
 input {
-  display: block;
-  margin: 10px auto;
+  margin: 5px;
   padding: 10px;
-  width: 220px;
 }
 
 button {
-  padding: 10px 15px;
-  margin: 10px;
-  border: none;
+  margin: 5px;
+  padding: 10px;
   background: #4facfe;
   color: white;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #3a8dde;
+  border: none;
 }
 
 .hidden {
   display: none;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  background: white;
-  margin: 5px auto;
-  padding: 10px;
-  width: 250px;
-  border-radius: 8px;
 }
