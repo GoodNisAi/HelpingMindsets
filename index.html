@@ -22,46 +22,54 @@
 
 <!-- HOME -->
 <section id="home">
-  <h2>Live Platform Stats</h2>
+  <h2>Live Stats</h2>
   <p>Teachers: <span id="teacherCount">0</span></p>
   <p>Classes: <span id="classCount">0</span></p>
-  <p>Students: <span id="studentCount">0</span></p>
 </section>
 
 <!-- AUTH -->
 <section id="auth" class="hidden">
-  <h2>Teacher Login / Signup</h2>
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
   <button onclick="signup()">Sign Up</button>
   <button onclick="login()">Login</button>
-  <button onclick="logout()">Logout</button>
 </section>
 
 <!-- TEACHER -->
 <section id="teacher" class="hidden">
   <h2>Teacher Dashboard</h2>
 
-  <button onclick="createClass()">Create Class</button>
-  <p id="classCode"></p>
+  <!-- ONLY SHOW AFTER LOGIN -->
+  <div id="teacherPanel" class="hidden">
 
-  <input id="assignmentInput" placeholder="Assignment">
-  <button onclick="addAssignment()">Add</button>
+    <h3>Class Controls</h3>
+    <button onclick="createClass()">Create New Class</button>
+    <p id="classCode"></p>
 
-  <ul id="assignmentList"></ul>
-  <ul id="studentList"></ul>
+    <h3>Student Codes</h3>
+    <button onclick="generateStudentCodes()">Generate Student Codes</button>
+    <ul id="studentCodes"></ul>
+
+    <h3>Subjects</h3>
+    <input id="subjectInput" placeholder="New Subject">
+    <button onclick="addSubject()">Add Subject</button>
+    <ul id="subjectList"></ul>
+
+  </div>
+
+  <p id="loginWarning">You must be logged in as a teacher</p>
 </section>
 
 <!-- STUDENT -->
 <section id="student" class="hidden">
-  <input id="codeInput" placeholder="Class code">
-  <input id="nameInput" placeholder="Name">
-  <button onclick="joinClass()">Join</button>
+  <h2>Student Join</h2>
+
+  <input id="studentCodeInput" placeholder="Enter student code">
+  <button onclick="joinWithCode()">Join</button>
 
   <div id="studentDashboard" class="hidden">
-    <h3 id="welcome"></h3>
+    <h3 id="studentName"></h3>
     <p>XP: <span id="xp">0</span></p>
-    <ul id="studentAssignments"></ul>
   </div>
 </section>
 
