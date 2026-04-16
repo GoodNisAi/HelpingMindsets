@@ -3,16 +3,17 @@
 <head>
   <title>Helping Mindsets</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="favicon.png">
 </head>
 <body>
 
 <header>
   <h1>Helping Mindsets</h1>
+  <p id="userInfo"></p>
 </header>
 
 <nav>
   <button onclick="showSection('home')">Home</button>
+  <button onclick="showSection('auth')">Login</button>
   <button onclick="showSection('teacher')">Teacher</button>
   <button onclick="showSection('student')">Student</button>
 </nav>
@@ -21,8 +22,20 @@
 
 <!-- HOME -->
 <section id="home">
-  <h2>Welcome</h2>
-  <p>Free classroom learning platform</p>
+  <h2>Live Platform Stats</h2>
+  <p>Teachers: <span id="teacherCount">0</span></p>
+  <p>Classes: <span id="classCount">0</span></p>
+  <p>Students: <span id="studentCount">0</span></p>
+</section>
+
+<!-- AUTH -->
+<section id="auth" class="hidden">
+  <h2>Teacher Login / Signup</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
+  <button onclick="logout()">Logout</button>
 </section>
 
 <!-- TEACHER -->
@@ -32,32 +45,22 @@
   <button onclick="createClass()">Create Class</button>
   <p id="classCode"></p>
 
-  <h3>Add Assignment</h3>
-  <input id="assignmentInput" placeholder="Question">
+  <input id="assignmentInput" placeholder="Assignment">
   <button onclick="addAssignment()">Add</button>
 
-  <h3>Assignments</h3>
   <ul id="assignmentList"></ul>
-
-  <h3>Students</h3>
   <ul id="studentList"></ul>
 </section>
 
 <!-- STUDENT -->
 <section id="student" class="hidden">
-  <h2>Student</h2>
-
-  <div id="joinArea">
-    <input id="codeInput" placeholder="Class code">
-    <input id="nameInput" placeholder="Your name">
-    <button onclick="joinClass()">Join</button>
-  </div>
+  <input id="codeInput" placeholder="Class code">
+  <input id="nameInput" placeholder="Name">
+  <button onclick="joinClass()">Join</button>
 
   <div id="studentDashboard" class="hidden">
-    <h3 id="welcomeName"></h3>
+    <h3 id="welcome"></h3>
     <p>XP: <span id="xp">0</span></p>
-
-    <h3>Assignments</h3>
     <ul id="studentAssignments"></ul>
   </div>
 </section>
