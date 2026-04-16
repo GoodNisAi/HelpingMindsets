@@ -6,74 +6,97 @@
 </head>
 <body>
 
-<header>
+<header class="topbar">
   <h1>Helping Mindsets</h1>
-  <p id="userInfo"></p>
+  <div id="userInfo"></div>
 </header>
 
-<nav>
-  <button onclick="showSection('home')">Home</button>
-  <button onclick="showSection('auth')">Login</button>
-  <button onclick="showSection('teacher')">Teacher</button>
-  <button onclick="showSection('student')">Student</button>
-</nav>
+<div class="app">
 
-<main>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <button onclick="show('home')">🏠 Home</button>
+    <button onclick="show('teacher')">🧑‍🏫 Teacher</button>
+    <button onclick="show('student')">🎓 Student</button>
+    <button onclick="show('auth')">🔐 Login</button>
+  </aside>
 
-<!-- HOME -->
-<section id="home">
-  <h2>Live Stats</h2>
-  <p>Teachers: <span id="teacherCount">0</span></p>
-  <p>Classes: <span id="classCount">0</span></p>
-</section>
+  <!-- CONTENT -->
+  <main class="content">
 
-<!-- AUTH -->
-<section id="auth" class="hidden">
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="signup()">Sign Up</button>
-  <button onclick="login()">Login</button>
-</section>
+    <!-- HOME -->
+    <section id="home">
+      <h2>Platform Stats</h2>
+      <div class="cards">
+        <div class="card">Teachers: <span id="teacherCount">0</span></div>
+        <div class="card">Classes: <span id="classCount">0</span></div>
+      </div>
+    </section>
 
-<!-- TEACHER -->
-<section id="teacher" class="hidden">
-  <h2>Teacher Dashboard</h2>
+    <!-- AUTH -->
+    <section id="auth" class="hidden">
+      <h2>Login / Signup</h2>
+      <input id="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
+      <button onclick="signup()">Sign Up</button>
+      <button onclick="login()">Login</button>
+    </section>
 
-  <!-- ONLY SHOW AFTER LOGIN -->
-  <div id="teacherPanel" class="hidden">
+    <!-- TEACHER -->
+    <section id="teacher" class="hidden">
+      <h2>Teacher Dashboard</h2>
 
-    <h3>Class Controls</h3>
-    <button onclick="createClass()">Create New Class</button>
-    <p id="classCode"></p>
+      <div id="teacherPanel" class="hidden">
 
-    <h3>Student Codes</h3>
-    <button onclick="generateStudentCodes()">Generate Student Codes</button>
-    <ul id="studentCodes"></ul>
+        <div class="card">
+          <h3>Class Controls</h3>
+          <button onclick="createClass()">Create Class</button>
+          <p id="classCode"></p>
+        </div>
 
-    <h3>Subjects</h3>
-    <input id="subjectInput" placeholder="New Subject">
-    <button onclick="addSubject()">Add Subject</button>
-    <ul id="subjectList"></ul>
+        <div class="card">
+          <h3>Student Codes</h3>
+          <button onclick="generateCodes()">Generate Codes</button>
+          <ul id="codesList"></ul>
+        </div>
 
-  </div>
+        <div class="card">
+          <h3>Subjects</h3>
+          <input id="subjectInput" placeholder="New subject">
+          <button onclick="addSubject()">Add</button>
+          <ul id="subjectList"></ul>
+        </div>
 
-  <p id="loginWarning">You must be logged in as a teacher</p>
-</section>
+        <div class="card">
+          <h3>Assignments</h3>
+          <input id="assignmentInput" placeholder="New assignment">
+          <button onclick="addAssignment()">Add</button>
+          <ul id="assignmentList"></ul>
+        </div>
 
-<!-- STUDENT -->
-<section id="student" class="hidden">
-  <h2>Student Join</h2>
+      </div>
 
-  <input id="studentCodeInput" placeholder="Enter student code">
-  <button onclick="joinWithCode()">Join</button>
+      <p id="teacherLock">Login as teacher to access</p>
+    </section>
 
-  <div id="studentDashboard" class="hidden">
-    <h3 id="studentName"></h3>
-    <p>XP: <span id="xp">0</span></p>
-  </div>
-</section>
+    <!-- STUDENT -->
+    <section id="student" class="hidden">
+      <h2>Student</h2>
 
-</main>
+      <input id="studentCodeInput" placeholder="Enter code">
+      <button onclick="join()">Join</button>
+
+      <div id="studentDash" class="hidden">
+        <h3 id="studentName"></h3>
+        <p>XP: <span id="xp">0</span></p>
+        <p>Level: <span id="level">0</span></p>
+
+        <ul id="studentAssignments"></ul>
+      </div>
+    </section>
+
+  </main>
+</div>
 
 <script type="module" src="script.js"></script>
 </body>
