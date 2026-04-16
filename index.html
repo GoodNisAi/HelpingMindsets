@@ -2,26 +2,68 @@
 <html>
 <head>
   <title>Helping Mindsets</title>
-  <link rel="icon" href="favicon.png">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.png">
 </head>
 <body>
 
+<header>
   <h1>Helping Mindsets</h1>
+</header>
 
-  <div class="container">
-    <div class="card">
-      <h2>Teacher</h2>
-      <button onclick="createClass()">Create Class</button>
-    </div>
+<nav>
+  <button onclick="showSection('home')">Home</button>
+  <button onclick="showSection('teacher')">Teacher</button>
+  <button onclick="showSection('student')">Student</button>
+</nav>
 
-    <div class="card">
-      <h2>Student</h2>
-      <button onclick="joinClass()">Join Class</button>
-    </div>
+<main>
+
+<!-- HOME -->
+<section id="home">
+  <h2>Welcome</h2>
+  <p>Free classroom learning platform</p>
+</section>
+
+<!-- TEACHER -->
+<section id="teacher" class="hidden">
+  <h2>Teacher Dashboard</h2>
+
+  <button onclick="createClass()">Create Class</button>
+  <p id="classCode"></p>
+
+  <h3>Add Assignment</h3>
+  <input id="assignmentInput" placeholder="Question">
+  <button onclick="addAssignment()">Add</button>
+
+  <h3>Assignments</h3>
+  <ul id="assignmentList"></ul>
+
+  <h3>Students</h3>
+  <ul id="studentList"></ul>
+</section>
+
+<!-- STUDENT -->
+<section id="student" class="hidden">
+  <h2>Student</h2>
+
+  <div id="joinArea">
+    <input id="codeInput" placeholder="Class code">
+    <input id="nameInput" placeholder="Your name">
+    <button onclick="joinClass()">Join</button>
   </div>
 
-  <script src="script.js"></script>
+  <div id="studentDashboard" class="hidden">
+    <h3 id="welcomeName"></h3>
+    <p>XP: <span id="xp">0</span></p>
 
+    <h3>Assignments</h3>
+    <ul id="studentAssignments"></ul>
+  </div>
+</section>
+
+</main>
+
+<script type="module" src="script.js"></script>
 </body>
 </html>
