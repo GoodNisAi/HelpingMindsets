@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
   getFirestore,
   doc,
@@ -7,59 +8,91 @@ import {
   collection,
   addDoc,
   onSnapshot,
-  updateDoc
+  increment,
+  updateDoc,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBQnhMU-9h2VCarsyGgEm1f2RFw5OuO84c",
   authDomain: "helpingmindesets.firebaseapp.com",
-  projectId: "helpingmindesets",
-  storageBucket: "helpingmindesets.firebasestorage.app",
-  messagingSenderId: "707348820262",
-  appId: "1:707348820262:web:cb57c28a3e737d528911e7"
+  projectId: "helpingmindesets"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
+let currentUser = null;
 let currentClass = "";
 let currentStudentId = "";
 
-// Navigation
+// NAV
 window.showSection = function(id) {
   document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 };
 
-// Generate code
-function generateCode() {
-  return Math.random().toString(36).substring(2, 7);
-}
+// AUTH
+window.signup = async function() {
+  const email = emailInput.value;
+  const password = passwordInput.value;
 
-// Create class
+  const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+  await setDoc(doc(db, "teachers", userCred.user.uid), {
+    email: email
+  });
+};
+
+window.login = async function() {
+  await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+};
+
+window.logout = function() {
+  signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  document.getElementById("userInfo").innerText =
+    user ? "Logged in: " + user.email : "Not logged in";
+});
+
+// CREATE CLASS
 window.createClass = async function() {
-  const code = generateCode();
+  if (!currentUser) return alert("Login first");
+
+  const code = Math.random().toString(36).substring(2, 7);
   currentClass = code;
 
   await setDoc(doc(db, "classes", code), {
-    createdAt: new Date()
+    teacherId: currentUser.uid
   });
 
-  document.getElementById("classCode").innerText = "Code: " + code;
+  document.getElementById("classCode").innerText = code;
 
-  listenStudents();
-  listenAssignments();
+  updateStats();
 };
 
-// Join class
+// JOIN CLASS
 window.joinClass = async function() {
-  const code = document.getElementById("codeInput").value;
-  const name = document.getElementById("nameInput").value;
+  const code = codeInput.value;
+  const name = nameInput.value;
 
   const ref = doc(db, "classes", code);
   const snap = await getDoc(ref);
 
-  if (!snap.exists()) return alert("Invalid code");
+  if (!snap.exists()) return alert("Invalid");
 
   currentClass = code;
 
@@ -70,55 +103,32 @@ window.joinClass = async function() {
 
   currentStudentId = studentRef.id;
 
-  document.getElementById("joinArea").classList.add("hidden");
   document.getElementById("studentDashboard").classList.remove("hidden");
 
-  document.getElementById("welcomeName").innerText = "Welcome " + name;
-
-  listenStudentAssignments();
+  listenXP();
+  listenAssignmentsStudent();
 };
 
-// Add assignment
+// ASSIGNMENTS
 window.addAssignment = async function() {
-  const text = document.getElementById("assignmentInput").value;
-
   await addDoc(collection(db, "classes", currentClass, "assignments"), {
-    text: text
+    text: assignmentInput.value
   });
 };
 
-// Listen students
-function listenStudents() {
-  onSnapshot(collection(db, "classes", currentClass, "students"), snap => {
-    const list = document.getElementById("studentList");
-    list.innerHTML = "";
+// STUDENT XP LISTENER
+function listenXP() {
+  const ref = doc(db, "classes", currentClass, "students", currentStudentId);
 
-    snap.forEach(doc => {
-      let li = document.createElement("li");
-      li.textContent = doc.data().name + " (XP: " + doc.data().xp + ")";
-      list.appendChild(li);
-    });
+  onSnapshot(ref, snap => {
+    document.getElementById("xp").innerText = snap.data().xp;
   });
 }
 
-// Listen assignments (teacher)
-function listenAssignments() {
+// STUDENT ASSIGNMENTS
+function listenAssignmentsStudent() {
   onSnapshot(collection(db, "classes", currentClass, "assignments"), snap => {
-    const list = document.getElementById("assignmentList");
-    list.innerHTML = "";
-
-    snap.forEach(doc => {
-      let li = document.createElement("li");
-      li.textContent = doc.data().text;
-      list.appendChild(li);
-    });
-  });
-}
-
-// Student view assignments
-function listenStudentAssignments() {
-  onSnapshot(collection(db, "classes", currentClass, "assignments"), snap => {
-    const list = document.getElementById("studentAssignments");
+    const list = studentAssignments;
     list.innerHTML = "";
 
     snap.forEach(docSnap => {
@@ -129,7 +139,7 @@ function listenStudentAssignments() {
       btn.textContent = "Complete";
 
       btn.onclick = async () => {
-        const studentRef = doc(
+        const ref = doc(
           db,
           "classes",
           currentClass,
@@ -137,8 +147,8 @@ function listenStudentAssignments() {
           currentStudentId
         );
 
-        await updateDoc(studentRef, {
-          xp: incrementXP()
+        await updateDoc(ref, {
+          xp: increment(10)
         });
       };
 
@@ -148,12 +158,23 @@ function listenStudentAssignments() {
   });
 }
 
-// XP system
-function incrementXP() {
-  let currentXP = parseInt(document.getElementById("xp").innerText);
-  let newXP = currentXP + 10;
+// SAFE GLOBAL STATS
+async function updateStats() {
+  const teachers = await getDocs(collection(db, "teachers"));
+  const classes = await getDocs(collection(db, "classes"));
 
-  document.getElementById("xp").innerText = newXP;
+  let studentTotal = 0;
 
-  return newXP;
+  for (let c of classes.docs) {
+    const students = await getDocs(
+      collection(db, "classes", c.id, "students")
+    );
+    studentTotal += students.size;
+  }
+
+  teacherCount.innerText = teachers.size;
+  classCount.innerText = classes.size;
+  studentCount.innerText = studentTotal;
 }
+
+updateStats();
